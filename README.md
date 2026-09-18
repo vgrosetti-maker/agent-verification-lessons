@@ -1,6 +1,6 @@
 # Agent verification lessons
 
-22 verification patterns, each one built from a real case where an AI agent reported
+23 verification patterns, each one built from a real case where an AI agent reported
 something that was not true, and the measurement that caught it.
 
 - **[PATTERNS.md](PATTERNS.md)** - the guide, in English.
@@ -58,6 +58,7 @@ confidently.
 4. Exit 0 proves termination, not work
 5. Smoke proves response; dry-run proves the dry path
 6. A signal proves execution only if it could not exist without it
+23. A clean merge is not a correct merge
 
 **Detectors**
 

@@ -1,6 +1,6 @@
 # Padrões de verificação
 
-22 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
+23 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
 
 Todos os casos vêm de logs anonimizados de trabalho real com agentes de IA. Nome de marca, de
 cliente e caminho local saíram; os números não. Cada caso carrega a procedência:
@@ -26,6 +26,7 @@ Caso sem número medido aparece sem número. Nada aqui foi arredondado para fica
 4. [Exit 0 prova término, não trabalho](#4-exit-0-prova-término-não-trabalho)
 5. [Smoke prova resposta; dry-run prova o caminho seco](#5-smoke-prova-resposta-dry-run-prova-o-caminho-seco)
 6. [Um sinal só prova execução se não pudesse existir sem ela](#6-um-sinal-só-prova-execução-se-não-pudesse-existir-sem-ela)
+23. [Merge limpo não é merge correto](#23-merge-limpo-não-é-merge-correto)
 
 **Detectores**
 
@@ -1329,17 +1330,51 @@ passa.
 
 ---
 
+## 23. Merge limpo não é merge correto
+
+**Sintoma.** Os dois lados mergearam sem conflito nenhum para resolver, e a checagem local que
+mandaram rodar voltou verde. Nada pediu decisão, então nada pareceu decisão.
+
+**Casos.**
+
+- Uma branch acrescentou uma entrada a um mapa de nomes; a outra acrescentou o arquivo a que essa
+  entrada se refere, num diretório que o mapa espelha. As duas edições caíram em linhas
+  diferentes, então o merge saiu limpo. O mapa mergeado ficou com 16 chaves para 17 arquivos em
+  disco (medido), e só um teste que confronta o mapa com o diretório pegou.
+- Uma segunda branch do mesmo repositório registrou um componente novo num catálogo sem
+  declará-lo no perfil que enumera esse catálogo. Esse merge também saiu limpo, e a branch
+  compartilhada ficou vermelha por 2h28 (medido) antes de alguém ligar a asserção que falhava ao
+  merge que a causou.
+
+**Regra.** Conflito é sobreposição de texto, não sentido quebrado. Quando um lado acrescenta o
+item a uma lista e o outro acrescenta aquilo a que o item se refere, nada se sobrepõe, e só um
+teste que compara os dois enxerga.
+
+**Como checar.**
+
+- Depois de mergear, rode todos os comandos que a pipeline roda, não o que o documento de
+  passagem nomeou. Leia a definição da pipeline para descobrir quais são: um repositório costuma
+  ter duas portas de entrada com coberturas diferentes, e a de nome tranquilizador pode ser a
+  menor das duas.
+- Antes de confiar num merge limpo, liste os arquivos que os dois lados tocaram e que enumeram
+  outra coisa: mapa de nomes, registro, índice, lista de habilitados. Compare a cópia mergeada
+  com aquilo que ela enumera.
+
+---
+
 ## A versão curta
 
-Se sobrar uma linha de cada: zero é o único resultado que instrumento quebrado e mundo vazio produzem
-igual; o zero que confirma você é o que precisa de auditoria; controle positivo prova que o instrumento
-acha alguma coisa, não que acha a classe que falha; exit code mede término; smoke mede resposta, não
-trabalho; um sinal só prova execução se não pudesse existir sem ela; detector que nunca acusou nada não
-é evidência de saúde; teste negativo tem que falhar pelo motivo que você afirma, e remover a guarda é
-mais barato que injetar defeito; meça efeito, não declaração; a régua não mora dentro do sistema
-medido; contagem de detector não é fila; fixture herda a patologia do acervo; o processo carrega a
-cópia instalada; suíte verde não prova que o gate roda; gate é afirmação positiva; exit diferente de
-zero significa "reprovou" ou "nunca mediu", e a saída embaralha os dois; número sem instrumento é
-depoimento; declarado não é feito; fato de segunda mão é hipótese; suspeite do seu instrumento antes do
-alvo; rode o comando que responde *aquela* pergunta; e pergunte o que é sucesso antes de otimizar
-qualquer coisa.
+Se sobrar uma linha de cada: zero é o único resultado que instrumento quebrado e mundo vazio
+produzem igual; o zero que confirma você é o que precisa de auditoria; controle positivo prova
+que o instrumento acha alguma coisa, não que acha a classe que falha; exit code mede término;
+smoke mede resposta, não trabalho; um sinal só prova execução se não pudesse existir sem ela;
+detector que nunca acusou nada não é evidência de saúde; teste negativo tem que falhar pelo
+motivo que você afirma, e remover a guarda é mais barato que injetar defeito; meça efeito, não
+declaração; a régua não mora dentro do sistema medido; contagem de detector não é fila; fixture
+herda a patologia do acervo; o processo carrega a cópia instalada; suíte verde não prova que o
+gate roda; gate é afirmação positiva; exit diferente de zero significa "reprovou" ou "nunca
+mediu", e a saída embaralha os dois; número sem instrumento é depoimento; declarado não é feito;
+fato de segunda mão é hipótese; suspeite do seu instrumento antes do alvo; rode o comando que
+responde *aquela* pergunta; e pergunte o que é sucesso antes de otimizar qualquer coisa · sem
+conflito quer dizer sem sobreposição de texto, não que o arquivo mergeado ainda concorda com o
+que descreve.

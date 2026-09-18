@@ -1,6 +1,6 @@
 # Verification patterns
 
-22 patterns, each in the same shape: **symptom → real case → rule → how to check**.
+23 patterns, each in the same shape: **symptom → real case → rule → how to check**.
 
 Every case below comes from anonymized logs of real work with AI agents. Names of brands,
 clients and local paths are removed; the numbers are not. Each case carries its provenance:
@@ -27,6 +27,7 @@ better.
 4. [Exit 0 proves termination, not work](#4-exit-0-proves-termination-not-work)
 5. [Smoke proves response; dry-run proves the dry path](#5-smoke-proves-response-dry-run-proves-the-dry-path)
 6. [A signal proves execution only if it could not exist without it](#6-a-signal-proves-execution-only-if-it-could-not-exist-without-it)
+23. [A clean merge is not a correct merge](#23-a-clean-merge-is-not-a-correct-merge)
 
 **Detectors**
 
@@ -1395,18 +1396,51 @@ that passes.
 
 ---
 
+## 23. A clean merge is not a correct merge
+
+**Symptom.** Both sides merged with no conflict to resolve, and the local check you were told to
+run came back green. Nothing asked for a decision, so nothing looked like a decision.
+
+**Cases.**
+
+- One branch added an entry to a map of names; the other branch added the file that entry refers
+  to, in a directory the map mirrors. The two edits landed on different lines, so the merge was
+  clean. The merged map held 16 keys for 17 files on disk (measured), and only a test comparing
+  the map against the directory caught it.
+- A second branch of the same repository registered a new component in a catalog without
+  declaring it in the profile that enumerates the catalog. That merge was clean too, and the
+  shared branch stayed red for 2h28 (measured) before anyone connected the failing assertion to
+  the merge that caused it.
+
+**Rule.** A conflict is textual overlap, not broken meaning. When one side adds an item to a list
+and the other side adds the thing that item refers to, nothing overlaps and only a test that
+compares the two can see it.
+
+**How to check.**
+
+- After merging, run every command the pipeline runs, not the one the handover document named.
+  Read the pipeline definition to find out which those are: a repository often has two entry
+  points with different coverage, and the one with the reassuring name may be the smaller of the
+  two.
+- Before trusting a clean merge, list the files both sides touched that enumerate something else:
+  a map of names, a registry, an index, an enabled list. Compare the merged copy against what it
+  enumerates.
+
+---
+
 ## The short version
 
 If you only keep one line from each: zero is the only result a broken instrument and an empty
 world produce identically · a zero that confirms you is the one to audit · a positive control
-proves the instrument finds something, not that it finds the failing class · an exit code measures
-termination · smoke measures response, not work · a signal proves execution only if it could not
-exist without it · a detector that never accused anything is not evidence of health · a negative
-test must fail for the reason you claim, and removing the guard is cheaper than injecting a defect
-· measure effect, not declaration · the ruler must not live inside the system measured · a
-detector's count is not a queue · fixtures must inherit the corpus's pathologies · the process
-loads the installed copy · a green suite does not prove the gate runs · a gate is a positive
-assertion · a nonzero exit means "failed" or "never measured", and the output blurs them · a
-number without its instrument is testimony · declared is not done · second-hand facts are
+proves the instrument finds something, not that it finds the failing class · an exit code
+measures termination · smoke measures response, not work · a signal proves execution only if it
+could not exist without it · a detector that never accused anything is not evidence of health · a
+negative test must fail for the reason you claim, and removing the guard is cheaper than
+injecting a defect · measure effect, not declaration · the ruler must not live inside the system
+measured · a detector's count is not a queue · fixtures must inherit the corpus's pathologies ·
+the process loads the installed copy · a green suite does not prove the gate runs · a gate is a
+positive assertion · a nonzero exit means "failed" or "never measured", and the output blurs them
+· a number without its instrument is testimony · declared is not done · second-hand facts are
 hypotheses · suspect your own instrument before the target · run the command that answers *that*
-question · and ask what success means before you optimize anything.
+question · and ask what success means before you optimize anything · no conflict means no textual
+overlap, not that the merged file still agrees with what it describes.

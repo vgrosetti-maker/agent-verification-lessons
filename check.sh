@@ -52,12 +52,24 @@ for f in "$EN" "$PT"; do
   fi
 done
 
-# Every entry in the index must point at a heading that exists.
-missing=0
-for n in $(grep -oE '^[0-9]+\.' "$EN" | tr -d '.'); do
-  grep -qE "^## $n\. " "$EN" || { echo "FAIL  index: entry $n has no heading"; missing=1; }
+# Every entry in the index must point at a heading that exists, in both files.
+for f in "$EN" "$PT"; do
+  entries=$(grep -cE '^[0-9]+\.' "$f" || true)
+  if [ "$entries" != 22 ]; then
+    echo "FAIL  index: $entries entries in $f, expected 22"
+    fail=1
+    continue
+  fi
+  missing=0
+  for n in $(grep -oE '^[0-9]+\.' "$f" | tr -d '.'); do
+    grep -qE "^## $n\. " "$f" || { echo "FAIL  index: entry $n has no heading in $f"; missing=1; }
+  done
+  if [ "$missing" = 0 ]; then
+    echo "ok    index: all $entries entries resolve to a heading in $f"
+  else
+    fail=1
+  fi
 done
-[ "$missing" = 0 ] && echo "ok    index: every entry resolves to a heading" || fail=1
 
 if [ "$fail" = 0 ]; then
   echo "PASS"

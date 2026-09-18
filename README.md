@@ -1,6 +1,6 @@
 # Agent verification lessons
 
-Twenty-two verification patterns, each one built from a real case where an AI agent reported
+22 verification patterns, each one built from a real case where an AI agent reported
 something that was not true, and the measurement that caught it.
 
 - **[PATTERNS.md](PATTERNS.md)** - the guide, in English.
@@ -100,6 +100,11 @@ at a party, it is written without one.
 Contributions of the same shape are welcome: symptom, real case with its numbers, rule, how to
 check. A pattern with no real case does not belong here. Contributions are accepted under the
 same license as the rest of this material: what comes in goes out under CC BY 4.0.
+
+New patterns are written through [tools/](tools/README.md): a proposal file goes through a set of
+gates (provenance, anonymization, duplication, parity between the two languages) before a byte is
+written, and `check.sh` decides whether the write survives. That is also how the guide grows from
+the sessions that produce the lessons in the first place.
 
 ## License
 

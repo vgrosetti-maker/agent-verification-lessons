@@ -1,0 +1,25 @@
+{
+  "group": "Gates",
+  "title_en": "An expectation hardcoded in the gate approves the past",
+  "title_pt": "Expectativa fixada no portão aprova o passado",
+  "symptom_en": "The gate is green, and it will stay green for exactly as long as the material does not grow. The number it compares against was typed by hand when the gate was written.",
+  "symptom_pt": "O portão está verde e vai continuar verde exatamente enquanto o material não crescer. O número contra o qual ele compara foi digitado à mão quando o portão nasceu.",
+  "cases_en": [
+    "A document gate asserted that a guide carried 22 sections and that its index had 22 entries (measured). Both numbers were literals in the script. The next section written would have failed the gate for existing, so the person adding it would have edited the expectation to match the file, which is the one edit that turns an assertion into a description."
+  ],
+  "cases_pt": [
+    "Um portão de documento afirmava que o guia tinha 22 seções e que o índice tinha 22 entradas (medido). Os dois números eram literais no script. A seção seguinte reprovaria por existir, e quem a escrevesse editaria a expectativa para bater com o arquivo, que é justamente a edição que transforma asserção em descrição."
+  ],
+  "rule_en": "An expectation that has to be edited every time the material changes will eventually be edited into agreement with whatever is there.",
+  "rule_pt": "Expectativa que precisa ser editada toda vez que o material muda acaba sendo editada para concordar com o que estiver lá.",
+  "check_en": [
+    "Derive the expected count from the material itself, then assert the other copies of it against that derived number.",
+    "Ask what the gate would do if one correct new item arrived. If the answer is \"it fails and I edit the number\", the gate is a description."
+  ],
+  "check_pt": [
+    "Derive a contagem esperada do próprio material e assere as outras cópias dela contra esse número derivado.",
+    "Pergunte o que o portão faria se chegasse um item novo e correto. Se a resposta é \"reprova e eu edito o número\", o portão é uma descrição."
+  ],
+  "short_en": "an expectation typed into the gate ends up edited to match the file",
+  "short_pt": "expectativa digitada no portão acaba editada para bater com o arquivo"
+}

@@ -8,3 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sh check.sh
+      # The gates that guard what enters the guide need their own negative
+      # tests run here: a gate nobody exercises is pattern 14.
+      - run: node tools/test-gates.js

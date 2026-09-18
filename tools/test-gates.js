@@ -46,6 +46,10 @@ function expectCode(label, mutate, code) {
 }
 
 expectCode('missing field', (p) => { delete p.rule_en; }, 'E_FIELD');
+expectCode('client work', (p) => { p.origin = 'client-work'; }, 'E_CLIENT');
+expectCode('special category', (p) => {
+  p.cases_en[0] += ' The record held a patient photograph.';
+}, 'E_SENSITIVE');
 expectCode('empty case', (p) => { p.cases_en = ['   ']; }, 'E_FIELD');
 expectCode('unknown group', (p) => { p.group = 'Things I feel strongly about'; }, 'E_GROUP');
 expectCode('language parity', (p) => { p.cases_pt = []; }, 'E_FIELD');

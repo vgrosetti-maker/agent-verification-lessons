@@ -17,6 +17,7 @@ A single JSON file. `tools/fixtures/example-proposal.json` is a working one.
 
 | Field | Meaning |
 |---|---|
+| `origin` | Where the case came from: `own-tooling`, `own-site` or `research`. A case from client work does not enter this repository, anonymized or not. |
 | `group` | One of the group labels already in the index of `PATTERNS.md` (`Gates`, `Detectors`, ...). The Portuguese label is taken from the same position in the Portuguese index. |
 | `title_en`, `title_pt` | The heading. No full stop at the end. |
 | `symptom_en`, `symptom_pt` | What it looks like from the outside, usually reassuring. |
@@ -44,6 +45,16 @@ reason and no other.
 | `E_EMDASH` | An em dash, which this repository does not use. |
 | `E_SIZE` | A title, symptom, rule, case or clause outside its length band. |
 | `E_DUP` | A title or rule that overlaps one already in the guide. The lesson belongs inside that pattern. |
+| `E_CLIENT` | An `origin` outside the allowed list, which is how a case from client work is stopped. |
+| `E_SENSITIVE` | A special-category signal (`patient`, `biometric`, `Art. 9`, `diagnosis`, and their Portuguese equivalents). |
+
+Two of those, `E_CLIENT` and `E_SENSITIVE`, exist for a failure the other gates cannot see.
+Literal anonymization is the floor: a case can carry no name, no path and no identifier and still
+reidentify its subject by combination, when several patterns each hold one fragment of the same
+incident and the repository itself narrows the field. A grep proves what it knows to look for.
+So the rule is upstream of the text: material derived from client work stays out, the lesson is
+kept and the case is dropped, and the README states no time window, sector or size of the
+operation the cases came from.
 
 ## The write
 

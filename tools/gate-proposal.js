@@ -31,12 +31,26 @@ const FORBIDDEN = [
   ['E_PRODUCT', 'product name', /(^|[^A-Za-z])(GitHub|GitLab|Airtable|Netlify|Supabase|Obsidian|Claude|Anthropic|OpenAI|ChatGPT|Upwork|Twilio|Playwright|Slack|Notion|Vercel|Cloudflare)([^A-Za-z]|$)/],
   ['E_PRIVATE', 'own brand or person', /(^|[^A-Za-z])(Nord ?Leads|NordVask|Brum|Chosen|Kurata|Nathalia|Grosetti|Vitor)([^A-Za-z]|$)/i],
   ['E_EMDASH', 'em dash', /—/],
+  // Special-category signals. Literal anonymization is the floor; what leaks is
+  // reidentification by combination, which no regex catches. These words are
+  // the ones that mean the case came from someone's personal data, and none of
+  // them appears in the current corpus, so a hit is a new case, not a false
+  // positive on existing prose.
+  ['E_SENSITIVE', 'special-category signal',
+    /(^|[^A-Za-z])(patient|biometric|GDPR|Art\.? ?9|medical record|diagnosis|prontuário|biométric\w*|paciente|diagnóstico|menor de idade|dado sensível|categoria especial)([^A-Za-z]|$)/i],
 ];
+
+// Where the case came from. The rule this encodes: material derived from client
+// work does not enter a public repository of ours, even anonymized, when it
+// involves a privacy incident, special-category data, or a combination that
+// reidentifies. The lesson stays, the case goes.
+const ORIGINS = ['own-tooling', 'own-site', 'research'];
 
 const PROVENANCE_EN = /\((measured|reported|inferred)\)/;
 const PROVENANCE_PT = /\((medido|dito|inferido)\)/;
 
 const FIELDS = {
+  origin: 'string',
   group: 'string',
   title_en: 'string', title_pt: 'string',
   symptom_en: 'string', symptom_pt: 'string',
@@ -127,7 +141,14 @@ function validate(p) {
   }
   if (errs.length) return errs; // nothing below can be trusted without the fields
 
-  // 2. The group has to be one the index already carries.
+  // 2. Where the case came from, declared. A declaration is not proof
+  //    (pattern 18), which is why the special-category regex runs as well, but
+  //    it forces the question to be asked before the case is written down.
+  if (!ORIGINS.includes(p.origin)) {
+    err('E_CLIENT', `origin "${p.origin}" is not one of: ${ORIGINS.join(' | ')}. A case from client work does not enter this repository, anonymized or not; keep the lesson, drop the case`);
+  }
+
+  // 3. The group has to be one the index already carries.
   const groupsEn = readGroups(EN);
   const groupsPt = readGroups(PT);
   const gi = groupsEn.indexOf(p.group);

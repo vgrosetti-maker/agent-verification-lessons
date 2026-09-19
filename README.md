@@ -1,6 +1,6 @@
 # Agent verification lessons
 
-23 verification patterns, each one built from a real case where an AI agent reported
+24 verification patterns, each one built from a real case where an AI agent reported
 something that was not true, and the measurement that caught it.
 
 - **[PATTERNS.md](PATTERNS.md)** - the guide, in English.
@@ -75,6 +75,7 @@ confidently.
 14. A green suite does not prove the gate runs
 15. A gate is a positive assertion, never the absence of the forbidden
 16. An aborted suite is a blind gate, and red lies too
+24. The adapter fabricates the zero the instrument never measured
 
 **Numbers and claims**
 

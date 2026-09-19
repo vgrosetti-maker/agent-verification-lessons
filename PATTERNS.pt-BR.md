@@ -1,6 +1,6 @@
 # Padrões de verificação
 
-23 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
+24 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
 
 Todos os casos vêm de logs anonimizados de trabalho real com agentes de IA. Nome de marca, de
 cliente e caminho local saíram; os números não. Cada caso carrega a procedência:
@@ -43,6 +43,7 @@ Caso sem número medido aparece sem número. Nada aqui foi arredondado para fica
 14. [Suíte verde não prova que o gate roda](#14-suíte-verde-não-prova-que-o-gate-roda)
 15. [Gate é afirmação positiva, nunca ausência do proibido](#15-gate-é-afirmação-positiva-nunca-ausência-do-proibido)
 16. [Suíte abortada é gate cego, e o vermelho também mente](#16-suíte-abortada-é-gate-cego-e-o-vermelho-também-mente)
+24. [O adaptador fabrica o zero que o instrumento nunca mediu](#24-o-adaptador-fabrica-o-zero-que-o-instrumento-nunca-mediu)
 
 **Números e afirmações**
 
@@ -1362,6 +1363,43 @@ teste que compara os dois enxerga.
 
 ---
 
+## 24. O adaptador fabrica o zero que o instrumento nunca mediu
+
+**Sintoma.** A sonda respondeu 200, o campo chegou, o número está lá. Nada falhou em lugar
+nenhum, e o consumidor afirma a ausência como fato.
+
+**Casos.**
+
+- Um leitor de sonda de estado escrevia `sessoes: typeof d.sessoes === 'number' ? d.sessoes : 0`.
+  A guarda dez linhas acima recusava a leitura inteira quando faltavam dois outros contadores,
+  com a justificativa escrita de que sonda meio-respondida é sonda muda. O sentinela logo abaixo
+  fazia o oposto com o terceiro contador, e um campo que a sonda nunca mandou saiu do adaptador
+  carimbado como medição.
+- O mesmo leitor montava o total com `runs = fonte.value.filter(ehOk)`, descartando todo registro
+  ilegível. Dez registros corrompidos e zero registros produzem a saída idêntica, `total: 0`, e é
+  essa contagem que o consumidor foi mandado usar. O consumidor aqui era um modelo de linguagem
+  pequeno, que não tem como auditar o número que recebe e o narra: 'não há nada rodando'.
+- Os dois sobreviveram a uma revisão que leu o código, e só caíram quando se perguntou a um
+  segundo revisor, especificamente, se o consumidor conseguia distinguir 'medi e deu zero' de
+  'não consegui medir'. Aplicadas depois quatro mutações no código corrigido, cada uma derrubou
+  exatamente um teste novo (medido).
+
+**Regra.** Zero que o instrumento nunca produziu é pior que instrumento quebrado: a falha é
+lavada em medição pelo código do meio, e nenhum erro sobrevive para ser achado.
+
+**Como checar.**
+
+- Procure, em todo adaptador entre um instrumento e seu consumidor, por `?? 0`, `: 0`, `|| 0` e
+  `.filter(`. Cada um é um lugar onde uma falha pode virar número.
+- Campo que a fonte não mandou tem que estar AUSENTE na saída, não preenchido por padrão; torne-o
+  opcional no tipo em vez de enchê-lo com um sentinela.
+- Descarte tem que voltar ao lado da contagem que ele reduziu, para o consumidor poder dizer 'li
+  N, não consegui ler M' em vez de afirmar um total que não é o total.
+- Pergunte do CONSUMIDOR, não do código: ele distingue 'medi e deu zero' de 'não consegui medir'?
+  Se a resposta é não, a distinção não existe, por mais cuidadoso que o código seja.
+
+---
+
 ## A versão curta
 
 Se sobrar uma linha de cada: zero é o único resultado que instrumento quebrado e mundo vazio
@@ -1377,4 +1415,4 @@ mediu", e a saída embaralha os dois; número sem instrumento é depoimento; dec
 fato de segunda mão é hipótese; suspeite do seu instrumento antes do alvo; rode o comando que
 responde *aquela* pergunta; e pergunte o que é sucesso antes de otimizar qualquer coisa · sem
 conflito quer dizer sem sobreposição de texto, não que o arquivo mergeado ainda concorda com o
-que descreve.
+que descreve · um valor padrão transforma leitura falhada em número medido.

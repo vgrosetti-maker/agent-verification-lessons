@@ -1,6 +1,6 @@
 # Verification patterns
 
-23 patterns, each in the same shape: **symptom → real case → rule → how to check**.
+24 patterns, each in the same shape: **symptom → real case → rule → how to check**.
 
 Every case below comes from anonymized logs of real work with AI agents. Names of brands,
 clients and local paths are removed; the numbers are not. Each case carries its provenance:
@@ -44,6 +44,7 @@ better.
 14. [A green suite does not prove the gate runs](#14-a-green-suite-does-not-prove-the-gate-runs)
 15. [A gate is a positive assertion, never the absence of the forbidden](#15-a-gate-is-a-positive-assertion-never-the-absence-of-the-forbidden)
 16. [An aborted suite is a blind gate, and red lies too](#16-an-aborted-suite-is-a-blind-gate-and-red-lies-too)
+24. [The adapter fabricates the zero the instrument never measured](#24-the-adapter-fabricates-the-zero-the-instrument-never-measured)
 
 **Numbers and claims**
 
@@ -1428,6 +1429,46 @@ compares the two can see it.
 
 ---
 
+## 24. The adapter fabricates the zero the instrument never measured
+
+**Symptom.** The probe answered 200, the field arrived, the number is there. Nothing failed
+anywhere, and the consumer states the absence as a fact.
+
+**Cases.**
+
+- A reader for a status probe wrote `sessions: typeof d.sessions === 'number' ? d.sessions : 0`.
+  The guard ten lines above it refused the whole reading when two other counters were missing, on
+  the stated grounds that a half-answered probe is a mute probe. The sentinel underneath it did
+  the opposite for the third counter, and a field the probe never sent left the adapter stamped
+  as a measurement.
+- The same reader built its total with `runs = source.value.filter(isOk)`, dropping every
+  unparseable record. Ten corrupt records and zero records produce the identical output, `total:
+  0`, and the record count is what the consumer was told to trust. The consumer here was a small
+  language model, which cannot audit the number it is handed and narrates it: 'nothing is
+  running'.
+- Both survived a review that read the code, and were caught only when a second reviewer was
+  asked specifically whether the consumer could distinguish 'measured, and it was zero' from
+  'could not measure'. Four mutations were then applied to the fixed code and each one brought
+  down exactly one new test (measured).
+
+**Rule.** A zero that the instrument never produced is worse than a broken instrument: the
+failure is laundered into a measurement by the code in between, and no error survives to be
+found.
+
+**How to check.**
+
+- Grep every adapter between an instrument and its consumer for `?? 0`, `: 0`, `|| 0` and
+  `.filter(`. Each one is a place where a failure can become a number.
+- A field the source did not send must be absent from the output, not defaulted; make it optional
+  in the type instead of filling it with a sentinel.
+- A discard has to be returned next to the count it reduced, so the consumer can say 'read N,
+  could not read M' instead of asserting a total that is not the total.
+- Ask of the consumer, not of the code: can it tell 'measured, and it was zero' from 'could not
+  measure'? If the answer is no, the distinction does not exist, however carefully the code was
+  written.
+
+---
+
 ## The short version
 
 If you only keep one line from each: zero is the only result a broken instrument and an empty
@@ -1443,4 +1484,5 @@ positive assertion · a nonzero exit means "failed" or "never measured", and the
 · a number without its instrument is testimony · declared is not done · second-hand facts are
 hypotheses · suspect your own instrument before the target · run the command that answers *that*
 question · and ask what success means before you optimize anything · no conflict means no textual
-overlap, not that the merged file still agrees with what it describes.
+overlap, not that the merged file still agrees with what it describes · a default value turns a
+failed reading into a measured number.

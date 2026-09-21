@@ -123,7 +123,10 @@ function main() {
   }
   console.log('ok    proposal passes every gate');
 
-  const before = Object.fromEntries(Object.entries(FILES).map(([k, f]) => [k, fs.readFileSync(f, 'utf8')]));
+  // `raw` is what goes back on a rollback, byte for byte. `before` is what gets
+  // edited: CRLF checkouts are normalized, or the exact-line anchors never match.
+  const raw = Object.fromEntries(Object.entries(FILES).map(([k, f]) => [k, fs.readFileSync(f, 'utf8')]));
+  const before = Object.fromEntries(Object.entries(raw).map(([k, t]) => [k, t.replace(/\r\n/g, '\n')]));
   const nums = [...before.en.matchAll(/^## (\d+)\. /gm)].map((m) => Number(m[1]));
   const N = Math.max(...nums) + 1;
   console.log(`info  writing pattern ${N}`);
@@ -189,8 +192,16 @@ function main() {
     const out = execFileSync('sh', ['check.sh'], { cwd: ROOT, encoding: 'utf8' });
     console.log(out.trim().split('\n').slice(-1)[0]);
   } catch (e) {
+    // No `sh` on PATH (PowerShell on Windows) is a gate that never ran, not a
+    // gate that said no. Saying "rejected" there sends the author hunting a
+    // defect in the pattern that is not there.
+    if (e.code === 'ENOENT') {
+      for (const [k, f] of Object.entries(FILES)) fs.writeFileSync(f, raw[k]);
+      console.log('NOT RUN  `sh` is not on PATH, so check.sh never ran; the files were restored. Run from a POSIX shell.');
+      process.exit(2);
+    }
     console.log((e.stdout || '').trim());
-    for (const [k, f] of Object.entries(FILES)) fs.writeFileSync(f, before[k]);
+    for (const [k, f] of Object.entries(FILES)) fs.writeFileSync(f, raw[k]);
     console.log('FAILED  check.sh rejected the result; the files were restored');
     process.exit(1);
   }

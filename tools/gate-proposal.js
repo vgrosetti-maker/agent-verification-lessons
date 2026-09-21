@@ -68,15 +68,21 @@ const SIZES = {
 };
 
 // ---------------------------------------------------------------- the corpus
+// A checkout with CRLF line endings (Windows, core.autocrlf=true) leaves a \r
+// before every \n, and every `$` anchor below stops matching. The overlap gate
+// then reads zero rules and approves a duplicate in silence, so line endings are
+// normalized on read, never assumed.
+const readText = (file) => fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+
 function readGroups(file) {
   // Group labels, in document order, as they appear in the index.
-  const body = fs.readFileSync(file, 'utf8');
+  const body = readText(file);
   const index = body.split(/^## /m)[1] || '';
   return (index.match(/^\*\*(.+?)\*\*$/gm) || []).map((l) => l.replace(/\*\*/g, ''));
 }
 
 function readExisting(file) {
-  const body = fs.readFileSync(file, 'utf8');
+  const body = readText(file);
   const out = [];
   const re = /^## (\d+)\. (.+)$/gm;
   let m;
@@ -88,7 +94,7 @@ function readRules(file) {
   // The whole rule, not its first line: rules wrap over several lines, and a
   // one-line read makes every long rule look short and stops the overlap check
   // from seeing the words that matter.
-  const body = fs.readFileSync(file, 'utf8');
+  const body = readText(file);
   const out = [];
   const re = /^\*\*(?:Rule|Regra)\.\*\* ([\s\S]*?)\n\n/gm;
   let m;

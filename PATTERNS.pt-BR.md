@@ -1,6 +1,6 @@
 # Padrões de verificação
 
-24 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
+25 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
 
 Todos os casos vêm de logs anonimizados de trabalho real com agentes de IA. Nome de marca, de
 cliente e caminho local saíram; os números não. Cada caso carrega a procedência:
@@ -50,6 +50,7 @@ Caso sem número medido aparece sem número. Nada aqui foi arredondado para fica
 17. [Número sem o instrumento é depoimento](#17-número-sem-o-instrumento-é-depoimento)
 18. [Declarado não é feito](#18-declarado-não-é-feito)
 19. [Fato de segunda mão, e fonte que venceu](#19-fato-de-segunda-mão-e-fonte-que-venceu)
+25. [Mecanismo que cabe na diferença não é a causa da diferença](#25-mecanismo-que-cabe-na-diferença-não-é-a-causa-da-diferença)
 
 **Antes de culpar o alvo**
 
@@ -1400,6 +1401,35 @@ lavada em medição pelo código do meio, e nenhum erro sobrevive para ser achad
 
 ---
 
+## 25. Mecanismo que cabe na diferença não é a causa da diferença
+
+**Sintoma.** Duas rodadas da mesma medição discordam, alguém acha um mecanismo grande o bastante
+para explicar a distância, e o ticket registra. Os números cabem, então ninguém reabre as
+rodadas.
+
+**Caso.**
+
+- Duas medições pagas de boot do mesmo perfil, no mesmo dia, diferiram 4.359 tokens (medido). Uma
+  sonda local gratuita mostrou que ligar os connectors da conta mexe cerca de 15.000 caracteres
+  do prompt (medido), e o ticket registrou que a distância cabia nesse regime. Três dias depois o
+  evento init das duas rodadas foi lido: zero servidores MCP em cada uma (medido). O que diferia
+  era o conjunto carregado, um plugin embutido novo, dois agentes a mais e uma versão mais nova
+  do CLI. A comparação estava confundida desde o início, e o regime não aconteceu em nenhuma das
+  rodadas.
+
+**Regra.** Antes de nomear a causa da distância entre duas rodadas, prove que as duas carregaram
+a mesma coisa; mecanismo que poderia explicar a distância é hipótese até as rodadas mostrarem que
+ele aconteceu.
+
+**Como checar.**
+
+- Grave, junto de cada número medido, a impressão do que a rodada carregou (versão, plugins,
+  servidores, agentes, tools), lida do próprio log da rodada e nunca declarada à mão.
+- Quando duas rodadas discordam, compare as impressões primeiro. Se diferem, o par está
+  confundido e nenhuma causa única se sustenta.
+
+---
+
 ## A versão curta
 
 Se sobrar uma linha de cada: zero é o único resultado que instrumento quebrado e mundo vazio
@@ -1415,4 +1445,5 @@ mediu", e a saída embaralha os dois; número sem instrumento é depoimento; dec
 fato de segunda mão é hipótese; suspeite do seu instrumento antes do alvo; rode o comando que
 responde *aquela* pergunta; e pergunte o que é sucesso antes de otimizar qualquer coisa · sem
 conflito quer dizer sem sobreposição de texto, não que o arquivo mergeado ainda concorda com o
-que descreve · um valor padrão transforma leitura falhada em número medido.
+que descreve · um valor padrão transforma leitura falhada em número medido · mecanismo que cabe
+na distância é hipótese até as duas rodadas mostrarem que aconteceu.

@@ -1,6 +1,6 @@
 # Verification patterns
 
-24 patterns, each in the same shape: **symptom → real case → rule → how to check**.
+25 patterns, each in the same shape: **symptom → real case → rule → how to check**.
 
 Every case below comes from anonymized logs of real work with AI agents. Names of brands,
 clients and local paths are removed; the numbers are not. Each case carries its provenance:
@@ -51,6 +51,7 @@ better.
 17. [A number without its instrument is testimony](#17-a-number-without-its-instrument-is-testimony)
 18. [Declared is not done](#18-declared-is-not-done)
 19. [Second-hand facts, and sources that expired](#19-second-hand-facts-and-sources-that-expired)
+25. [A mechanism that fits the delta is not the cause of the delta](#25-a-mechanism-that-fits-the-delta-is-not-the-cause-of-the-delta)
 
 **Before you blame the target**
 
@@ -1469,6 +1470,33 @@ found.
 
 ---
 
+## 25. A mechanism that fits the delta is not the cause of the delta
+
+**Symptom.** Two runs of the same measurement disagree, someone finds a mechanism big enough to
+explain the gap, and the ticket records it. The numbers fit, so nobody opens the runs again.
+
+**Case.**
+
+- Two paid startup measurements of the same profile, on the same day, differed by 4,359 tokens
+  (measured). A free local probe showed that switching the account connectors on moves about
+  15,000 characters of prompt (measured), and the ticket recorded that the gap fit that regime.
+  Three days later the init event of both runs was read: zero MCP servers in each (measured).
+  What differed was the loaded set, one new built-in plugin, two more agents and a newer CLI
+  version. The comparison was confounded from the start, and the regime never happened in either
+  run.
+
+**Rule.** Before naming a cause for the gap between two runs, prove the two runs loaded the same
+thing; a mechanism that could explain the gap is a hypothesis until the runs show it happened.
+
+**How to check.**
+
+- Record, next to every measured number, the fingerprint of what the run loaded (version,
+  plugins, servers, agents, tools), read from the run's own log and never declared by hand.
+- When two runs disagree, diff the fingerprints first. If they differ, the pair is confounded and
+  no single cause is supported.
+
+---
+
 ## The short version
 
 If you only keep one line from each: zero is the only result a broken instrument and an empty
@@ -1485,4 +1513,5 @@ positive assertion · a nonzero exit means "failed" or "never measured", and the
 hypotheses · suspect your own instrument before the target · run the command that answers *that*
 question · and ask what success means before you optimize anything · no conflict means no textual
 overlap, not that the merged file still agrees with what it describes · a default value turns a
-failed reading into a measured number.
+failed reading into a measured number · a mechanism that fits the gap is a hypothesis until both
+runs show it happened.

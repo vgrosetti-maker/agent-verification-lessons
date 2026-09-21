@@ -1,6 +1,6 @@
 # Agent verification lessons
 
-24 verification patterns, each one built from a real case where an AI agent reported
+25 verification patterns, each one built from a real case where an AI agent reported
 something that was not true, and the measurement that caught it.
 
 - **[PATTERNS.md](PATTERNS.md)** - the guide, in English.
@@ -82,6 +82,7 @@ confidently.
 17. A number without its instrument is testimony
 18. Declared is not done
 19. Second-hand facts, and sources that expired
+25. A mechanism that fits the delta is not the cause of the delta
 
 **Before you blame the target**
 

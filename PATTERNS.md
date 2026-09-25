@@ -1,6 +1,6 @@
 # Verification patterns
 
-25 patterns, each in the same shape: **symptom → real case → rule → how to check**.
+26 patterns, each in the same shape: **symptom → real case → rule → how to check**.
 
 Every case below comes from anonymized logs of real work with AI agents. Names of brands,
 clients and local paths are removed; the numbers are not. Each case carries its provenance:
@@ -45,6 +45,7 @@ better.
 15. [A gate is a positive assertion, never the absence of the forbidden](#15-a-gate-is-a-positive-assertion-never-the-absence-of-the-forbidden)
 16. [An aborted suite is a blind gate, and red lies too](#16-an-aborted-suite-is-a-blind-gate-and-red-lies-too)
 24. [The adapter fabricates the zero the instrument never measured](#24-the-adapter-fabricates-the-zero-the-instrument-never-measured)
+26. [The detector already collects the field and only lacks the verdict](#26-the-detector-already-collects-the-field-and-only-lacks-the-verdict)
 
 **Numbers and claims**
 
@@ -1497,6 +1498,31 @@ thing; a mechanism that could explain the gap is a hypothesis until the runs sho
 
 ---
 
+## 26. The detector already collects the field and only lacks the verdict
+
+**Symptom.** The ticket says the data still has to be collected, and whoever reads it budgets a
+collector: new parsing, new storage, new plumbing. The collector is already there, filling a
+variable nobody judges.
+
+**Case.**
+
+- A transcript classifier was reported as blind to what a delegation brief said. The field was
+  being accumulated since a fix 19 days earlier (measured) and was already read by the verdict,
+  but only to check presence. The missing piece was judging its content: 17 lines added, 7 of
+  them code (measured), against a ticket written as if the data had to be collected first.
+
+**Rule.** Collection without a verdict is the common case, so a missing verdict gets reported as
+missing data.
+
+**How to check.**
+
+- Before budgeting "we need to collect X", search the collector for the field name. If it is
+  already stored, the work is the judgment, not the plumbing.
+- For each collected field, name the line that turns it into pass or fail. A field with no such
+  line is being collected for nobody.
+
+---
+
 ## The short version
 
 If you only keep one line from each: zero is the only result a broken instrument and an empty
@@ -1514,4 +1540,4 @@ hypotheses · suspect your own instrument before the target · run the command t
 question · and ask what success means before you optimize anything · no conflict means no textual
 overlap, not that the merged file still agrees with what it describes · a default value turns a
 failed reading into a measured number · a mechanism that fits the gap is a hypothesis until both
-runs show it happened.
+runs show it happened · the field is already collected; what is missing is the verdict.

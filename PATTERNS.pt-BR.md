@@ -1,6 +1,6 @@
 # Padrões de verificação
 
-25 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
+26 padrões, todos no mesmo formato: **sintoma, caso real, regra, como checar**.
 
 Todos os casos vêm de logs anonimizados de trabalho real com agentes de IA. Nome de marca, de
 cliente e caminho local saíram; os números não. Cada caso carrega a procedência:
@@ -44,6 +44,7 @@ Caso sem número medido aparece sem número. Nada aqui foi arredondado para fica
 15. [Gate é afirmação positiva, nunca ausência do proibido](#15-gate-é-afirmação-positiva-nunca-ausência-do-proibido)
 16. [Suíte abortada é gate cego, e o vermelho também mente](#16-suíte-abortada-é-gate-cego-e-o-vermelho-também-mente)
 24. [O adaptador fabrica o zero que o instrumento nunca mediu](#24-o-adaptador-fabrica-o-zero-que-o-instrumento-nunca-mediu)
+26. [O detector já coleta o campo e só falta o veredito](#26-o-detector-já-coleta-o-campo-e-só-falta-o-veredito)
 
 **Números e afirmações**
 
@@ -1430,6 +1431,32 @@ ele aconteceu.
 
 ---
 
+## 26. O detector já coleta o campo e só falta o veredito
+
+**Sintoma.** O ticket diz que ainda falta coletar o dado, e quem lê orça um coletor: parse novo,
+armazenamento novo, encanamento novo. O coletor já está lá, enchendo uma variável que ninguém
+julga.
+
+**Caso.**
+
+- Um classificador de transcripts foi reportado como cego ao que o briefing de delegação dizia. O
+  campo era acumulado desde um conserto de 19 dias antes (medido) e já era lido pelo veredito,
+  mas só para checar presença. O que faltava era julgar o conteúdo: 17 linhas adicionadas, 7
+  delas de código (medido), contra um ticket escrito como se o dado ainda precisasse ser
+  coletado.
+
+**Regra.** Coleta sem veredito é o caso comum, e por isso veredito ausente é reportado como dado
+ausente.
+
+**Como checar.**
+
+- Antes de orçar "precisamos coletar X", procure o nome do campo no coletor. Se ele já é
+  guardado, o trabalho é o julgamento, não o encanamento.
+- Para cada campo coletado, aponte a linha que o transforma em passa ou reprova. Campo sem essa
+  linha está sendo coletado para ninguém.
+
+---
+
 ## A versão curta
 
 Se sobrar uma linha de cada: zero é o único resultado que instrumento quebrado e mundo vazio
@@ -1446,4 +1473,5 @@ fato de segunda mão é hipótese; suspeite do seu instrumento antes do alvo; ro
 responde *aquela* pergunta; e pergunte o que é sucesso antes de otimizar qualquer coisa · sem
 conflito quer dizer sem sobreposição de texto, não que o arquivo mergeado ainda concorda com o
 que descreve · um valor padrão transforma leitura falhada em número medido · mecanismo que cabe
-na distância é hipótese até as duas rodadas mostrarem que aconteceu.
+na distância é hipótese até as duas rodadas mostrarem que aconteceu · o campo já é coletado; o
+que falta é o veredito.
